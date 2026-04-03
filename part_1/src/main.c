@@ -15,16 +15,12 @@
  * 2. Use Paulmon2 to jump to location 2000
  * 
  * Functionality:
- * The user is prompted to input the last 2 digits of their student ID in addition to providing a valid buffer size between 64-1024 bytes that is divisible
- * by 32. After that the user is able to through the use of special keyboard inputs fill up various buffers with characters.
- * 
- * ? displays the contents of buffers 0 and 1 and then empties them. It also provides useful statistics about each of the buffers
- * = prints the contents of buffers 0 and 1 in hex format
- * % empties all of the buffers
- * @ restarts the program
- * $ copies the contents of buffer 0 into buffer 3
- * # converts any uppercase letter in buffer 3 into lowercase
- *
+ * The user is prompted to make one of 4 commands in a terminal environment; w for write, r for read, h for hex dump, and e for reset. 
+ * This program uses an i2c library by Sriharsha at https://github.com/sriharshaq/8051-Library/blob/master/I2C/i2c.c . 
+ * w prompts the user to select a page, an address, and finally a byte of data to be sent to the eeprom
+ * r prompts the user for a page and an address and reports via the terminal what the data in that byte is
+ * h dumps in hex the values between 2 addresses in a page set by the user with 16 bytes of data displayed per line
+ * e resets the eeprom as per an709
  * SDCC version - 4.2.0
  * make version- GNU Make version 3.77
    ---------------------------------------------------------------------------------*/
@@ -40,11 +36,11 @@
 
 
 void main(){
-    //initialize i2c?
-    i2cSetPort();
-    //i2csetAdd(0xA0);
-    i2cBegin(11059200, 1);
 
+    i2cSetPort();
+    //sets the clock timing
+    i2cBegin(11059200, 1);
+    //sets a defualt address
     i2csetAdd(0xA0);
     printf("\n\r Lab4 Part 1 EEPROM Program\n\r");
 
@@ -55,7 +51,7 @@ void main(){
     }
 
 }
-
+//grabs input from the terminal over uart
 int Input(){
     char temp[6];
     char c;
@@ -83,14 +79,15 @@ void Program()
     while(1)
     {
         printf("\n\r ------ Commands ------\n\r");
-        printf("\n\r W : Write Byte\n\r");
-        printf("\n\r R : Read Byte\n\r");
-        printf("\n\r H : Hex Dump\n\r");
+        printf("\n\r w : Write Byte\n\r");
+        printf("\n\r r : Read Byte\n\r");
+        printf("\n\r h : Hex Dump\n\r");
         printf("\n\r e : Reset EEPROM\n\r");
         c = getchar();
         putchar(c);
         if(c == 'w')
         {
+            //writes a byte to an address
             printf("\n\r Writing a Byte\n\r");
             printf("\n\r Page: ");
             
@@ -102,14 +99,14 @@ void Program()
             printf("\n\r Data: ");
 
             int data = Input();
-            //put write funciton call here
+            //sets up the correct device and page address
             int temp = 0xA0;
             temp = temp | (page << 1);
             temp = temp & 0xFE;
             i2csetAdd(temp);
             i2cWrite(data, address);
         }
-
+        //reads the contents of an address
         else if(c == 'r'){
             printf("\n\r Reading a Byte\n\r");
             printf("\n\r Page: ");
@@ -118,7 +115,7 @@ void Program()
             printf("\n\r Address: ");
             
             int address = Input();
-            //actualyl do i2c read
+            //sets up the correct device and page address
             int temp = 0xA0;
             temp = temp | (page << 1);
             temp = temp & 0xFE;
@@ -127,27 +124,47 @@ void Program()
             
             printf("\n\r Data is: %d\n\r", data);
         }
-
-        else if(c == 'd'){
+        //prints the contents of a page between 2 addresses with 16 bytes per line
+        else if(c == 'h'){
             printf("\n\r Hex Dump\n\r");
+            printf("\n\r Page: ");
+            int page = Input();
             printf("\n\r Address Start: ");
-            
+
             int address1 = Input();  
 
             printf("\n\r Address End: ");
             
-            int address2 = Input();         
+            int address2 = Input();
+            int length = address2-address1;  
+            //sets up the correct device and page address
+            int temp = 0xA0;
+            temp = temp | (page << 1);
+            temp = temp & 0xFE;
+            i2csetAdd(temp);      
+            for(int i = 0; i < length; i++){
+                if(i % 16 == 0){
+                    printf("\n\r ");
+                    printf("%X%X ", page, address1+i);
+                }
+                unsigned char data = i2cRead(address1+i);
+                printf("%X ", data);
+            }
+            
         }
              
 
-            //iterate through addresses, printing 16 per line
-
+        //resets the 24lc16b as per an709 
         else if(c == 'e'){
             printf("\n\r Reseting EEPROM\n\r");
             //start bit
             i2cStartonce();
             //9 bits of 1
             for(int i = 0; i < 9; i++){
+                SDA_HIGH;
+                SCL_HIGH;
+                i2cClock();
+                SCL_LOW;
                 i2cClock();
             }
             //start bit

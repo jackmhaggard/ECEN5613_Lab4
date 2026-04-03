@@ -46,17 +46,17 @@ C:   00000008  l_REG_BANK_0
 C:   00000008  s_REG_BANK_1                    
 C:   0000000A  l_GSINIT2                       
 C:   00000010  s_REG_BANK_2                    
-C:   00000017  s_OSEG                          
 C:   00000018  s_BIT_BANK                      
 C:   00000018  s_REG_BANK_3                    
+C:   00000019  s_OSEG                          
 C:   00000020  s_BSEG_BYTES                    
 C:   00000020  s__CODE                         
 C:   00000021  s_SSEG                          
 C:   00000022  l_GSINIT3                       
 C:   0000002A  l_GSINIT4                       
 C:   0000004C  l_HOME                          
-C:   0000007B  l_DSEG                          
-C:   0000007D  l_XSEG                          
+C:   0000007D  l_DSEG                          
+C:   00000086  l_XSEG                          
 ASxxxx Linker V03.00/V05.40 + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
@@ -66,11 +66,11 @@ CABS                                00000000    00000000 =           0. bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-C:   0000007E  s_XISEG                         
+C:   00000087  s_XISEG                         
 C:   000000DF  l_SSEG                          
 C:   00000100  l_IRAM                          
-C:   0000013A  l_CONST                         
-C:   00001478  l_CSEG                          
+C:   00000148  l_CONST                         
+C:   0000170B  l_CSEG                          
 C:   00002000  s_HOME                          
 C:   0000204C  s_GSINIT0                       
 C:   0000204F  s_GSINIT1                       
@@ -81,8 +81,8 @@ C:   000020A5  s_GSFINAL
 C:   000020A5  s_GSINIT                        
 C:   000020A5  s_GSINIT5                       
 C:   000020A8  s_CSEG                          
-C:   00003520  s_CONST                         
-C:   0000365A  s_XINIT                         
+C:   000037B3  s_CONST                         
+C:   000038FB  s_XINIT                         
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 3.
 Hexadecimal  [32-Bits]
@@ -344,18 +344,18 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-DSEG                                00000000    0000007B =         123. bytes (REL,CON)
+DSEG                                00000000    0000007D =         125. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000016  _bp                                _bp
+     00000018  _bp                                _bp
 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 10.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-OSEG                                00000017    00000004 =           4. bytes (REL,OVR)
+OSEG                                00000019    00000004 =           4. bytes (REL,OVR)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -375,7 +375,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-XSEG                                00000001    0000007D =         125. bytes (REL,CON,XDATA)
+XSEG                                00000001    00000086 =         134. bytes (REL,CON,XDATA)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -388,24 +388,27 @@ D:   00000023  _i2cReadBlock_PARM_3               i2c
 D:   00000027  __divulong_PARM_2                  _divulong
 D:   00000039  __gptrput_PARM_2                   _gptrput
 D:   0000003A  __mulint_PARM_2                    _mulint
-D:   0000003C  __divsint_PARM_2                   _divsint
-D:   00000040  __divuint_PARM_2                   _divuint
-D:   00000047  _vprintf_PARM_2                    vprintf
-D:   0000005C  __print_format_PARM_2              printf_large
-D:   0000005F  __print_format_PARM_3              printf_large
-D:   00000062  __print_format_PARM_4              printf_large
+D:   0000003C  __modsint_PARM_2                   _modsint
+D:   00000040  __moduint_PARM_2                   _moduint
+D:   00000045  __divsint_PARM_2                   _divsint
+D:   00000049  __divuint_PARM_2                   _divuint
+D:   00000050  _vprintf_PARM_2                    vprintf
+D:   00000065  __print_format_PARM_2              printf_large
+D:   00000068  __print_format_PARM_3              printf_large
+D:   0000006B  __print_format_PARM_4              printf_large
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 13.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-XISEG                               0000007E    00000003 =           3. bytes (REL,CON,XDATA)
+XISEG                               00000087    00000003 =           3. bytes (REL,CON,XDATA)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-D:   0000007E  _SlaveACK                          i2c
-D:   0000007F  _DevAddress                        i2c
-D:   00000080  _ClockVar                          i2c
+D:   00000087  _SlaveACK                          i2c
+D:   00000088  _DevAddress                        i2c
+D:   00000089  _ClockVar                          i2c
 ASxxxx Linker V03.00/V05.40 + sdld,  page 14.
 Hexadecimal  [32-Bits]
 
@@ -478,49 +481,52 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CSEG                                000020A8    00001478 =        5240. bytes (REL,CON,CODE)
+CSEG                                000020A8    0000170B =        5899. bytes (REL,CON,CODE)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
 C:   000020A8  _main                              main
 C:   000020E1  _Input                             main
 C:   0000213C  _Program                           main
-C:   00002380  _putchar                           my_serial
-C:   0000239F  _getchar                           my_serial
-C:   000023AD  __time_out_timer_0__               i2c
-C:   000023B9  _i2cSetPort                        i2c
-C:   000023C4  _i2cDelay                          i2c
-C:   000023E9  _i2cavailable                      i2c
-C:   00002404  _i2cStart                          i2c
-C:   00002421  _i2cStartonce                      i2c
-C:   00002438  _i2cStop                           i2c
-C:   0000244D  _i2cWritebyte                      i2c
-C:   000024C3  _i2cReadbyte                       i2c
-C:   00002551  _i2cWrite                          i2c
-C:   0000258D  _i2cRead                           i2c
-C:   000025DD  _i2cBegin                          i2c
-C:   0000268D  _i2csetAdd                         i2c
-C:   00002699  _i2cDetect                         i2c
-C:   0000269A  _i2cWriteBlock                     i2c
-C:   000026F6  _i2cReadBlock                      i2c
-C:   00002750  __divulong                         _divulong
-C:   00002844  _atoi                              atoi
-C:   00002964  __gptrput                          _gptrput
-C:   0000297F  __mulint                           _mulint
-C:   0000299F  __divsint                          _divsint
-C:   00002A11  __divuint                          _divuint
-C:   00002AAD  _vprintf                           vprintf
-C:   00002AEC  _printf                            vprintf
-C:   00002BF0  __print_format                     printf_large
-C:   000034E8  _strlen                            strlen
-C:   00003500  __gptrget                          _gptrget
-C:   0000351C  ___sdcc_external_startup           _startup
+C:   00002500  _putchar                           my_serial
+C:   0000251F  _getchar                           my_serial
+C:   0000252D  __time_out_timer_0__               i2c
+C:   00002539  _i2cSetPort                        i2c
+C:   00002544  _i2cDelay                          i2c
+C:   00002569  _i2cavailable                      i2c
+C:   00002584  _i2cStart                          i2c
+C:   000025A1  _i2cStartonce                      i2c
+C:   000025B8  _i2cStop                           i2c
+C:   000025CD  _i2cWritebyte                      i2c
+C:   00002643  _i2cReadbyte                       i2c
+C:   000026D1  _i2cWrite                          i2c
+C:   0000270D  _i2cRead                           i2c
+C:   0000275D  _i2cBegin                          i2c
+C:   0000280D  _i2csetAdd                         i2c
+C:   00002819  _i2cDetect                         i2c
+C:   0000281A  _i2cWriteBlock                     i2c
+C:   00002876  _i2cReadBlock                      i2c
+C:   000028D0  __divulong                         _divulong
+C:   000029C4  _atoi                              atoi
+C:   00002AE4  __gptrput                          _gptrput
+C:   00002AFF  __mulint                           _mulint
+C:   00002B1F  __modsint                          _modsint
+C:   00002B87  __moduint                          _moduint
+C:   00002C32  __divsint                          _divsint
+C:   00002CA4  __divuint                          _divuint
+C:   00002D40  _vprintf                           vprintf
+C:   00002D7F  _printf                            vprintf
+C:   00002E83  __print_format                     printf_large
+C:   0000377B  _strlen                            strlen
+C:   00003793  __gptrget                          _gptrget
+C:   000037AF  ___sdcc_external_startup           _startup
+
 ASxxxx Linker V03.00/V05.40 + sdld,  page 21.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CONST                               00003520    0000013A =         314. bytes (REL,CON,CODE)
+CONST                               000037B3    00000148 =         328. bytes (REL,CON,CODE)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -529,7 +535,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-XINIT                               0000365A    00000003 =           3. bytes (REL,CON,CODE)
+XINIT                               000038FB    00000003 =           3. bytes (REL,CON,CODE)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -556,6 +562,10 @@ C:\Program Files\SDCC\bin\..\lib\large/libsdcc.lib
                                           [ _gptrput.rel ]
 C:\Program Files\SDCC\bin\..\lib\large/libint.lib
                                           [ _mulint.rel ]
+C:\Program Files\SDCC\bin\..\lib\large/libint.lib
+                                          [ _modsint.rel ]
+C:\Program Files\SDCC\bin\..\lib\large/libint.lib
+                                          [ _moduint.rel ]
 C:\Program Files\SDCC\bin\..\lib\large/libint.lib
                                           [ _divsint.rel ]
 C:\Program Files\SDCC\bin\..\lib\large/mcs51.lib

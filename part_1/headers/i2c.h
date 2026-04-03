@@ -60,11 +60,10 @@
 #define SDABIT 1 << 1         // SDA Bit Position
 #define SCLBIT 1 << 0         // SCL Bit Position
 
-//#define SDA ( (SDAPIN ) & (SDABIT) ) // SDA
-//#define SCL ( (SCLPIN ) & (SCLBIT) ) // SCL
+// sets the SDA port and pin
 #define SDA P1_1
 #define SCL P1_0
-
+//macros for operating SDA and SCL
 #define SDA_HIGH SDA = 1
 #define SDA_LOW  SDA = 0
 

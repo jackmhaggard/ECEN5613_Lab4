@@ -431,6 +431,8 @@ _CY	=	0x00d7
 ; internal ram data
 ;--------------------------------------------------------
 	.area DSEG    (DATA)
+_Program_sloc0_1_0:
+	.ds 2
 ;--------------------------------------------------------
 ; overlayable items in internal ram
 ;--------------------------------------------------------
@@ -702,6 +704,7 @@ _Input:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'Program'
 ;------------------------------------------------------------
+;sloc0         Allocated with name '_Program_sloc0_1_0'
 ;c             Allocated with name '_Program_c_10000_71'
 ;page          Allocated with name '_Program_page_30001_74'
 ;address       Allocated with name '_Program_address_30002_75'
@@ -711,9 +714,14 @@ _Input:
 ;address       Allocated with name '_Program_address_30002_79'
 ;temp          Allocated with name '_Program_temp_30002_79'
 ;data          Allocated with name '_Program_data_30003_80'
-;address1      Allocated with name '_Program_address1_30001_82'
-;address2      Allocated with name '_Program_address2_30002_83'
-;i             Allocated with name '_Program_i_40000_85'
+;page          Allocated with name '_Program_page_30001_82'
+;address1      Allocated with name '_Program_address1_30002_83'
+;address2      Allocated with name '_Program_address2_30003_84'
+;length        Allocated with name '_Program_length_30003_84'
+;temp          Allocated with name '_Program_temp_30003_84'
+;i             Allocated with name '_Program_i_40003_85'
+;data          Allocated with name '_Program_data_50004_88'
+;i             Allocated with name '_Program_i_40000_90'
 ;------------------------------------------------------------
 ;	src/main.c:79: void Program()
 ;	-----------------------------------------
@@ -721,7 +729,7 @@ _Input:
 ;	-----------------------------------------
 _Program:
 ;	src/main.c:83: while(1)
-00114$:
+00117$:
 ;	src/main.c:85: printf("\n\r ------ Commands ------\n\r");
 	mov	a,#___str_2
 	push	acc
@@ -733,7 +741,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:86: printf("\n\r W : Write Byte\n\r");
+;	src/main.c:86: printf("\n\r w : Write Byte\n\r");
 	mov	a,#___str_3
 	push	acc
 	mov	a,#(___str_3 >> 8)
@@ -744,7 +752,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:87: printf("\n\r R : Read Byte\n\r");
+;	src/main.c:87: printf("\n\r r : Read Byte\n\r");
 	mov	a,#___str_4
 	push	acc
 	mov	a,#(___str_4 >> 8)
@@ -755,7 +763,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:88: printf("\n\r H : Hex Dump\n\r");
+;	src/main.c:88: printf("\n\r h : Hex Dump\n\r");
 	mov	a,#___str_5
 	push	acc
 	mov	a,#(___str_5 >> 8)
@@ -789,11 +797,11 @@ _Program:
 	lcall	_putchar
 	pop	ar6
 ;	src/main.c:92: if(c == 'w')
-	cjne	r6,#0x77,00164$
-	sjmp	00165$
-00164$:
-	ljmp	00111$
-00165$:
+	cjne	r6,#0x77,00188$
+	sjmp	00189$
+00188$:
+	ljmp	00114$
+00189$:
 ;	src/main.c:94: printf("\n\r Writing a Byte\n\r");
 	mov	a,#___str_7
 	push	acc
@@ -883,14 +891,14 @@ _Program:
 	movx	@dptr,a
 	mov	dpl, r1
 	lcall	_i2cWrite
-	ljmp	00114$
-00111$:
+	ljmp	00117$
+00114$:
 ;	src/main.c:113: else if(c == 'r'){
-	cjne	r6,#0x72,00166$
-	sjmp	00167$
-00166$:
-	ljmp	00108$
-00167$:
+	cjne	r6,#0x72,00190$
+	sjmp	00191$
+00190$:
+	ljmp	00111$
+00191$:
 ;	src/main.c:114: printf("\n\r Reading a Byte\n\r");
 	mov	a,#___str_11
 	push	acc
@@ -969,10 +977,14 @@ _Program:
 	mov	a,sp
 	add	a,#0xfb
 	mov	sp,a
-	ljmp	00114$
-00108$:
-;	src/main.c:131: else if(c == 'd'){
-	cjne	r6,#0x64,00105$
+	ljmp	00117$
+00111$:
+;	src/main.c:131: else if(c == 'h'){
+	cjne	r6,#0x68,00192$
+	sjmp	00193$
+00192$:
+	ljmp	00108$
+00193$:
 ;	src/main.c:132: printf("\n\r Hex Dump\n\r");
 	mov	a,#___str_13
 	push	acc
@@ -984,7 +996,24 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:133: printf("\n\r Address Start: ");
+;	src/main.c:133: printf("\n\r Page: ");
+	mov	a,#___str_8
+	push	acc
+	mov	a,#(___str_8 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:134: int page = Input();
+	lcall	_Input
+	mov	r5, dpl
+	mov	r7, dph
+;	src/main.c:135: printf("\n\r Address Start: ");
+	push	ar7
+	push	ar5
 	mov	a,#___str_14
 	push	acc
 	mov	a,#(___str_14 >> 8)
@@ -995,9 +1024,13 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:135: int address1 = Input();  
+;	src/main.c:137: int address1 = Input();  
 	lcall	_Input
-;	src/main.c:137: printf("\n\r Address End: ");
+	mov	r3, dpl
+	mov	r4, dph
+;	src/main.c:139: printf("\n\r Address End: ");
+	push	ar4
+	push	ar3
 	mov	a,#___str_15
 	push	acc
 	mov	a,#(___str_15 >> 8)
@@ -1008,17 +1041,94 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:139: int address2 = Input();         
+;	src/main.c:141: int address2 = Input();
 	lcall	_Input
-	ljmp	00114$
-00105$:
-;	src/main.c:145: else if(c == 'e'){
-	cjne	r6,#0x65,00170$
-	sjmp	00171$
-00170$:
-	ljmp	00114$
-00171$:
-;	src/main.c:146: printf("\n\r Reseting EEPROM\n\r");
+	mov	a, dpl
+	mov	b, dph
+	pop	ar3
+	pop	ar4
+	pop	ar5
+;	src/main.c:142: int length = address2-address1;  
+	clr	c
+	subb	a,r3
+	mov	r1,a
+	mov	a,b
+	subb	a,r4
+	mov	r2,a
+;	src/main.c:144: temp = temp | (page << 1);
+	mov	ar0,r5
+	mov	a,r0
+	add	a,r0
+	mov	r0,a
+	mov	a,#0xa0
+	orl	a,r0
+;	src/main.c:145: temp = temp & 0xFE;
+	anl	a,#0xfe
+;	src/main.c:146: i2csetAdd(temp);      
+	mov	dpl,a
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	push	ar1
+	lcall	_i2csetAdd
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+;	src/main.c:147: for(int i = 0; i < length; i++){
+	clr	a
+	mov	_Program_sloc0_1_0,a
+	mov	(_Program_sloc0_1_0 + 1),a
+00120$:
+	clr	c
+	mov	a,_Program_sloc0_1_0
+	subb	a,r1
+	mov	a,(_Program_sloc0_1_0 + 1)
+	xrl	a,#0x80
+	mov	b,r2
+	xrl	b,#0x80
+	subb	a,b
+	jc	00194$
+	ljmp	00117$
+00194$:
+;	src/main.c:148: if(i % 16 == 0){
+	mov	dptr,#__modsint_PARM_2
+	mov	a,#0x10
+	movx	@dptr,a
+	clr	a
+	inc	dptr
+	movx	@dptr,a
+	mov	dpl, _Program_sloc0_1_0
+	mov	dph, (_Program_sloc0_1_0 + 1)
+	push	ar7
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	push	ar1
+	lcall	__modsint
+	mov	a, dpl
+	mov	b, dph
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+	orl	a,b
+	jnz	00102$
+;	src/main.c:149: printf("\n\r ");
+	push	ar1
+	push	ar2
+	push	ar7
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	push	ar1
 	mov	a,#___str_16
 	push	acc
 	mov	a,#(___str_16 >> 8)
@@ -1029,28 +1139,148 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:148: i2cStartonce();
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+;	src/main.c:150: printf("%X%X ", page, address1+i);
+	mov	a,_Program_sloc0_1_0
+	add	a, r3
+	mov	r0,a
+	mov	a,(_Program_sloc0_1_0 + 1)
+	addc	a, r4
+	mov	r2,a
+	push	ar7
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	push	ar1
+	push	ar0
+	push	ar2
+	push	ar5
+	push	ar7
+	mov	a,#___str_17
+	push	acc
+	mov	a,#(___str_17 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xf9
+	mov	sp,a
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+;	src/main.c:166: for(int i = 0; i < 9; i++){
+	pop	ar2
+	pop	ar1
+;	src/main.c:150: printf("%X%X ", page, address1+i);
+00102$:
+;	src/main.c:152: unsigned char data = i2cRead(address1+i);
+	push	ar1
+	push	ar2
+	mov	ar0,r3
+	mov	a,_Program_sloc0_1_0
+	add	a, r0
+	mov	dpl,a
+	push	ar7
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar1
+	lcall	_i2cRead
+	mov	r2, dpl
+	pop	ar1
+;	src/main.c:153: printf("%X ", data);
+	mov	ar1,r2
+	mov	r2,#0x00
+	push	ar2
+	push	ar1
+	push	ar1
+	push	ar2
+	mov	a,#___str_18
+	push	acc
+	mov	a,#(___str_18 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+;	src/main.c:147: for(int i = 0; i < length; i++){
+	inc	_Program_sloc0_1_0
+	clr	a
+	cjne	a,_Program_sloc0_1_0,00196$
+	inc	(_Program_sloc0_1_0 + 1)
+00196$:
+	pop	ar2
+	pop	ar1
+	ljmp	00120$
+00108$:
+;	src/main.c:161: else if(c == 'e'){
+	cjne	r6,#0x65,00197$
+	sjmp	00198$
+00197$:
+	ljmp	00117$
+00198$:
+;	src/main.c:162: printf("\n\r Reseting EEPROM\n\r");
+	mov	a,#___str_19
+	push	acc
+	mov	a,#(___str_19 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:164: i2cStartonce();
 	lcall	_i2cStartonce
-;	src/main.c:150: for(int i = 0; i < 9; i++){
+;	src/main.c:166: for(int i = 0; i < 9; i++){
 	mov	r7,#0x00
-00117$:
-	cjne	r7,#0x09,00172$
-00172$:
-	jnc	00101$
-;	src/main.c:151: i2cClock();
+00123$:
+	cjne	r7,#0x09,00199$
+00199$:
+	jnc	00104$
+;	src/main.c:167: SDA_HIGH;
+;	assignBit
+	setb	_P1_1
+;	src/main.c:168: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/main.c:169: i2cClock();
 	push	ar7
 	lcall	_i2cDelay
+;	src/main.c:170: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/main.c:171: i2cClock();
+	lcall	_i2cDelay
 	pop	ar7
-;	src/main.c:150: for(int i = 0; i < 9; i++){
+;	src/main.c:166: for(int i = 0; i < 9; i++){
 	inc	r7
-	sjmp	00117$
-00101$:
-;	src/main.c:154: i2cStartonce();
+	sjmp	00123$
+00104$:
+;	src/main.c:174: i2cStartonce();
 	lcall	_i2cStartonce
-;	src/main.c:156: i2cStop();
+;	src/main.c:176: i2cStop();
 	lcall	_i2cStop
-;	src/main.c:161: }
-	ljmp	00114$
+;	src/main.c:181: }
+	ljmp	00117$
 	.area CSEG    (CODE)
 	.area CONST   (CODE)
 	.area CONST   (CODE)
@@ -1081,7 +1311,7 @@ ___str_2:
 ___str_3:
 	.db 0x0a
 	.db 0x0d
-	.ascii " W : Write Byte"
+	.ascii " w : Write Byte"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -1090,7 +1320,7 @@ ___str_3:
 ___str_4:
 	.db 0x0a
 	.db 0x0d
-	.ascii " R : Read Byte"
+	.ascii " r : Read Byte"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -1099,7 +1329,7 @@ ___str_4:
 ___str_5:
 	.db 0x0a
 	.db 0x0d
-	.ascii " H : Hex Dump"
+	.ascii " h : Hex Dump"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -1186,6 +1416,23 @@ ___str_15:
 	.area CSEG    (CODE)
 	.area CONST   (CODE)
 ___str_16:
+	.db 0x0a
+	.db 0x0d
+	.ascii " "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_17:
+	.ascii "%X%X "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_18:
+	.ascii "%X "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_19:
 	.db 0x0a
 	.db 0x0d
 	.ascii " Reseting EEPROM"

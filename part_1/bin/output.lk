@@ -1,0 +1,21 @@
+-muwx
+-i bin/output.hex
+-M
+-X 0x7fff
+-C 0x6000
+-b HOME = 0x2000
+-b XSEG = 0x0001
+-b PSEG = 0x0001
+-b ISEG = 0x0000
+-b BSEG = 0x0000
+-k C:\Program Files\SDCC\bin\..\lib\large
+-l mcs51
+-l libsdcc
+-l libint
+-l liblong
+-l libfloat
+bin/main.rel
+bin/my_serial.rel
+bin/i2c.rel
+
+-e

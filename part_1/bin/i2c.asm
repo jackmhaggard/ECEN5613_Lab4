@@ -262,8 +262,6 @@ _i2cReadBlock_sloc0_1_0:
 ; bit data
 ;--------------------------------------------------------
 	.area BSEG    (BIT)
-_i2cavailable_sloc0_1_0:
-	.ds 1
 ;--------------------------------------------------------
 ; paged external ram data
 ;--------------------------------------------------------
@@ -274,6 +272,8 @@ _i2cavailable_sloc0_1_0:
 	.area XSEG    (XDATA)
 _i2cDelay_ClockVar_10000_17:
 	.ds 2
+_i2cavailable_sloc0_1_0:
+	.ds 1
 _i2cWritebyte_uByte_10000_29:
 	.ds 1
 _i2cWritebyte_MaskByte_10000_30:
@@ -384,13 +384,15 @@ __time_out_timer_0__:
 ;	-----------------------------------------
 _i2cSetPort:
 ;	src/i2c.c:55: SDADIR |= SDABIT;
-	orl	_P0,#0x01
+	orl	_P1,#0x02
 ;	src/i2c.c:56: SCLDIR |= SCLBIT;
-	orl	_P0,#0x02
+	orl	_P1,#0x01
 ;	src/i2c.c:57: SDA_HIGH;
-	orl	_P0,#0x01
+;	assignBit
+	setb	_P1_1
 ;	src/i2c.c:58: SCL_HIGH;
-	orl	_P0,#0x02
+;	assignBit
+	setb	_P1_0
 ;	src/i2c.c:59: }
 	ret
 ;------------------------------------------------------------
@@ -440,24 +442,29 @@ _i2cDelay:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cavailable'
 ;------------------------------------------------------------
+;sloc0         Allocated with name '_i2cavailable_sloc0_1_0'
+;------------------------------------------------------------
 ;	src/i2c.c:82: unsigned char i2cavailable(void)
 ;	-----------------------------------------
 ;	 function i2cavailable
 ;	-----------------------------------------
 _i2cavailable:
 ;	src/i2c.c:84: return (!(SDA | SCL));
-	mov	a,#0x01
-	anl	a,_P0
-	mov	r7,a
-	mov	a,#0x02
-	anl	a,_P0
-	orl	ar7,a
-	mov	a,r7
-	cjne	a,#0x01,00103$
-00103$:
-	mov  _i2cavailable_sloc0_1_0,c
+	mov	dptr,#_i2cavailable_sloc0_1_0
+	mov	c,_P1_1
+	orl	c,_P1_0
 	clr	a
 	rlc	a
+	movx	@dptr,a
+	mov	dptr,#_i2cavailable_sloc0_1_0
+	movx	a,@dptr
+	cjne	a,#0x01,00103$
+00103$:
+	clr	a
+	rlc	a
+	movx	@dptr,a
+	mov	dptr,#_i2cavailable_sloc0_1_0
+	movx	a,@dptr
 ;	src/i2c.c:85: }
 	mov	dpl,a
 	ret
@@ -472,15 +479,15 @@ _i2cStart:
 ;	src/i2c.c:95: back:
 00101$:
 ;	src/i2c.c:96: if(SDA == 0)
-	mov	a,_P0
-	jnb	acc.0,00101$
+	jnb	_P1_1,00101$
 ;	src/i2c.c:98: if(SCL == 0)
-	mov	a,_P0
-	jnb	acc.1,00101$
+	jnb	_P1_0,00101$
 ;	src/i2c.c:101: SDA_HIGH;
-	orl	_P0,#0x01
+;	assignBit
+	setb	_P1_1
 ;	src/i2c.c:102: SCL_HIGH;
-	orl	_P0,#0x02
+;	assignBit
+	setb	_P1_0
 ;	src/i2c.c:103: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
@@ -490,24 +497,28 @@ _i2cStart:
 	mov	dph, r7
 	lcall	_i2cDelay
 ;	src/i2c.c:104: SDA_LOW;
-	anl	_P0,#0xfe
+;	assignBit
+	clr	_P1_1
 ;	src/i2c.c:105: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:106: }
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:109: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cStartonce'
 ;------------------------------------------------------------
-;	src/i2c.c:113: void i2cStartonce(void)
+;	src/i2c.c:116: void i2cStartonce(void)
 ;	-----------------------------------------
 ;	 function i2cStartonce
 ;	-----------------------------------------
 _i2cStartonce:
-;	src/i2c.c:115: SDA_HIGH;
-	orl	_P0,#0x01
-;	src/i2c.c:116: SCL_HIGH;
-	orl	_P0,#0x02
-;	src/i2c.c:117: i2cClock(ClockVar);
+;	src/i2c.c:118: SDA_HIGH;
+;	assignBit
+	setb	_P1_1
+;	src/i2c.c:119: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:120: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
 	mov	r6,a
@@ -515,25 +526,29 @@ _i2cStartonce:
 	mov	dpl, r6
 	mov	dph, r7
 	lcall	_i2cDelay
-;	src/i2c.c:118: SDA_LOW;
-	anl	_P0,#0xfe
-;	src/i2c.c:119: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:120: }
+;	src/i2c.c:121: SDA_LOW;
+;	assignBit
+	clr	_P1_1
+;	src/i2c.c:122: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:123: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cStop'
 ;------------------------------------------------------------
-;	src/i2c.c:127: void i2cStop(void)
+;	src/i2c.c:130: void i2cStop(void)
 ;	-----------------------------------------
 ;	 function i2cStop
 ;	-----------------------------------------
 _i2cStop:
-;	src/i2c.c:129: SDA_LOW;
-	anl	_P0,#0xfe
-;	src/i2c.c:130: SCL_HIGH;
-	orl	_P0,#0x02
-;	src/i2c.c:131: i2cClock(ClockVar);
+;	src/i2c.c:133: SDA_LOW;
+;	assignBit
+	clr	_P1_1
+;	src/i2c.c:134: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:135: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
 	mov	r6,a
@@ -541,11 +556,10 @@ _i2cStop:
 	mov	dpl, r6
 	mov	dph, r7
 	lcall	_i2cDelay
-;	src/i2c.c:132: SDA_HIGH;
-	orl	_P0,#0x01
-;	src/i2c.c:133: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:134: }
+;	src/i2c.c:136: SDA_HIGH;
+;	assignBit
+	setb	_P1_1
+;	src/i2c.c:138: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cWritebyte'
@@ -553,7 +567,7 @@ _i2cStop:
 ;uByte         Allocated with name '_i2cWritebyte_uByte_10000_29'
 ;MaskByte      Allocated with name '_i2cWritebyte_MaskByte_10000_30'
 ;------------------------------------------------------------
-;	src/i2c.c:141: void i2cWritebyte(unsigned char uByte)
+;	src/i2c.c:145: void i2cWritebyte(unsigned char uByte)
 ;	-----------------------------------------
 ;	 function i2cWritebyte
 ;	-----------------------------------------
@@ -561,30 +575,33 @@ _i2cWritebyte:
 	mov	a,dpl
 	mov	dptr,#_i2cWritebyte_uByte_10000_29
 	movx	@dptr,a
-;	src/i2c.c:144: MaskByte = 0x80;
+;	src/i2c.c:148: MaskByte = 0x80;
 	mov	dptr,#_i2cWritebyte_MaskByte_10000_30
 	mov	a,#0x80
 	movx	@dptr,a
-;	src/i2c.c:145: do
+;	src/i2c.c:149: do
 	mov	dptr,#_i2cWritebyte_uByte_10000_29
 	movx	a,@dptr
 	mov	r7,a
 00104$:
-;	src/i2c.c:147: if(uByte & MaskByte)
+;	src/i2c.c:151: if(uByte & MaskByte)
 	mov	dptr,#_i2cWritebyte_MaskByte_10000_30
 	movx	a,@dptr
 	anl	a,r7
 	jz	00102$
-;	src/i2c.c:148: SDA_HIGH;
-	orl	_P0,#0x01
+;	src/i2c.c:152: SDA_HIGH;
+;	assignBit
+	setb	_P1_1
 	sjmp	00103$
 00102$:
-;	src/i2c.c:150: SDA_LOW;
-	anl	_P0,#0xfe
+;	src/i2c.c:154: SDA_LOW;
+;	assignBit
+	clr	_P1_1
 00103$:
-;	src/i2c.c:151: SCL_HIGH;
-	orl	_P0,#0x02
-;	src/i2c.c:152: i2cClock(ClockVar);
+;	src/i2c.c:155: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:156: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
 	mov	r5,a
@@ -593,9 +610,10 @@ _i2cWritebyte:
 	mov	dph, r6
 	push	ar7
 	lcall	_i2cDelay
-;	src/i2c.c:153: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:154: i2cClock(ClockVar);
+;	src/i2c.c:157: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:158: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
 	mov	r5,a
@@ -604,20 +622,19 @@ _i2cWritebyte:
 	mov	dph, r6
 	lcall	_i2cDelay
 	pop	ar7
-;	src/i2c.c:155: MaskByte /= 2;
+;	src/i2c.c:159: MaskByte /= 2;
 	mov	dptr,#_i2cWritebyte_MaskByte_10000_30
 	movx	a,@dptr
 	mov	b,#0x02
 	div	ab
 	movx	@dptr,a
-;	src/i2c.c:157: while(MaskByte>0);
+;	src/i2c.c:161: while(MaskByte>0);
 	movx	a,@dptr
 	jnz	00104$
-;	src/i2c.c:158: SDA_HIGH;
-	orl	_P0,#0x01
-;	src/i2c.c:159: SCL_HIGH;
-	orl	_P0,#0x02
-;	src/i2c.c:160: i2cClock(ClockVar);
+;	src/i2c.c:163: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:164: i2cClock(ClockVar);
 	mov	dptr,#_ClockVar
 	movx	a,@dptr
 	mov	r6,a
@@ -625,15 +642,24 @@ _i2cWritebyte:
 	mov	dpl, r6
 	mov	dph, r7
 	lcall	_i2cDelay
-;	src/i2c.c:161: SlaveACK = SDA;
+;	src/i2c.c:165: SlaveACK = SDA;
 	mov	dptr,#_SlaveACK
-	mov	a,#0x01
-	anl	a,_P0
+	mov	c,_P1_1
+	clr	a
+	rlc	a
 	movx	@dptr,a
-;	src/i2c.c:162: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:163: }
-	ret
+;	src/i2c.c:166: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:167: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+;	src/i2c.c:168: }
+	ljmp	_i2cDelay
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cReadbyte'
 ;------------------------------------------------------------
@@ -641,7 +667,7 @@ _i2cWritebyte:
 ;uByte         Allocated with name '_i2cReadbyte_uByte_10000_33'
 ;MaskByte      Allocated with name '_i2cReadbyte_MaskByte_10000_33'
 ;------------------------------------------------------------
-;	src/i2c.c:170: unsigned char i2cReadbyte(unsigned char MasterACK)
+;	src/i2c.c:175: unsigned char i2cReadbyte(unsigned char MasterACK)
 ;	-----------------------------------------
 ;	 function i2cReadbyte
 ;	-----------------------------------------
@@ -649,24 +675,22 @@ _i2cReadbyte:
 	mov	a,dpl
 	mov	dptr,#_i2cReadbyte_MasterACK_10000_32
 	movx	@dptr,a
-;	src/i2c.c:174: uByte    = 0;
+;	src/i2c.c:179: uByte    = 0;
 	mov	dptr,#_i2cReadbyte_uByte_10000_33
 	clr	a
 	movx	@dptr,a
-;	src/i2c.c:175: MaskByte = 0x80;
+;	src/i2c.c:180: MaskByte = 0x80;
 	mov	dptr,#_i2cReadbyte_MaskByte_10000_33
 	mov	a,#0x80
 	movx	@dptr,a
-;	src/i2c.c:176: do
+;	src/i2c.c:181: do
 00103$:
-;	src/i2c.c:178: SCL_HIGH;
-	orl	_P0,#0x02
-;	src/i2c.c:179: if(SDA == 1)
-	mov	a,#0x01
-	anl	a,_P0
-	mov	r7,a
-	cjne	r7,#0x01,00102$
-;	src/i2c.c:181: uByte |= MaskByte;
+;	src/i2c.c:184: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:186: if(SDA == 1)
+	jnb	_P1_1,00102$
+;	src/i2c.c:188: uByte |= MaskByte;
 	mov	dptr,#_i2cReadbyte_MaskByte_10000_33
 	movx	a,@dptr
 	mov	r7,a
@@ -675,37 +699,82 @@ _i2cReadbyte:
 	orl	a,r7
 	movx	@dptr,a
 00102$:
-;	src/i2c.c:183: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:184: MaskByte /= 2;
+;	src/i2c.c:190: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+	lcall	_i2cDelay
+;	src/i2c.c:191: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:192: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+	lcall	_i2cDelay
+;	src/i2c.c:193: MaskByte /= 2;
 	mov	dptr,#_i2cReadbyte_MaskByte_10000_33
 	movx	a,@dptr
 	mov	b,#0x02
 	div	ab
 	movx	@dptr,a
-;	src/i2c.c:186: while(MaskByte > 0);
+;	src/i2c.c:195: while(MaskByte > 0);
 	movx	a,@dptr
 	jnz	00103$
-;	src/i2c.c:187: if(MasterACK==1)
+;	src/i2c.c:196: SCL_HIGH;
+;	assignBit
+	setb	_P1_0
+;	src/i2c.c:197: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+	lcall	_i2cDelay
+;	src/i2c.c:198: if(MasterACK==1)
 	mov	dptr,#_i2cReadbyte_MasterACK_10000_32
 	movx	a,@dptr
 	mov	r7,a
 	cjne	r7,#0x01,00107$
-;	src/i2c.c:188: SDA_HIGH;
-	orl	_P0,#0x01
+;	src/i2c.c:199: SDA_HIGH;
+;	assignBit
+	setb	_P1_1
 	sjmp	00108$
 00107$:
-;	src/i2c.c:190: SDA_LOW;
-	anl	_P0,#0xfe
+;	src/i2c.c:201: SDA_LOW;
+;	assignBit
+	clr	_P1_1
 00108$:
-;	src/i2c.c:191: SCL_LOW;
-	anl	_P0,#0xfc
-;	src/i2c.c:192: SDA_HIGH;
-	orl	_P0,#0x01
-;	src/i2c.c:193: return uByte;
+;	src/i2c.c:202: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+	lcall	_i2cDelay
+;	src/i2c.c:204: SCL_LOW;
+;	assignBit
+	clr	_P1_0
+;	src/i2c.c:206: i2cClock(ClockVar);
+	mov	dptr,#_ClockVar
+	movx	a,@dptr
+	mov	r6,a
+	mov	r7,#0x00
+	mov	dpl, r6
+	mov	dph, r7
+	lcall	_i2cDelay
+;	src/i2c.c:208: return uByte;
 	mov	dptr,#_i2cReadbyte_uByte_10000_33
 	movx	a,@dptr
-;	src/i2c.c:194: }
+;	src/i2c.c:209: }
 	mov	dpl,a
 	ret
 ;------------------------------------------------------------
@@ -714,7 +783,7 @@ _i2cReadbyte:
 ;Address       Allocated with name '_i2cWrite_PARM_2'
 ;Byte          Allocated with name '_i2cWrite_Byte_10000_36'
 ;------------------------------------------------------------
-;	src/i2c.c:201: void i2cWrite(unsigned char Byte,unsigned char Address)
+;	src/i2c.c:216: void i2cWrite(unsigned char Byte,unsigned char Address)
 ;	-----------------------------------------
 ;	 function i2cWrite
 ;	-----------------------------------------
@@ -722,42 +791,42 @@ _i2cWrite:
 	mov	a,dpl
 	mov	dptr,#_i2cWrite_Byte_10000_36
 	movx	@dptr,a
-;	src/i2c.c:203: do
+;	src/i2c.c:218: do
 00103$:
-;	src/i2c.c:205: i2cStart();
-	lcall	_i2cStart
-;	src/i2c.c:206: i2cWritebyte(DevAddress);
+;	src/i2c.c:220: i2cStartonce();
+	lcall	_i2cStartonce
+;	src/i2c.c:221: i2cWritebyte(DevAddress);
 	mov	dptr,#_DevAddress
 	movx	a,@dptr
 	mov	dpl,a
 	lcall	_i2cWritebyte
-;	src/i2c.c:207: if(SlaveACK == 1)
+;	src/i2c.c:223: if(SlaveACK == 1)
 	mov	dptr,#_SlaveACK
 	movx	a,@dptr
 	mov	r7,a
 	cjne	r7,#0x01,00104$
-;	src/i2c.c:208: i2cStop();
+;	src/i2c.c:224: i2cStop();
 	lcall	_i2cStop
 00104$:
-;	src/i2c.c:210: while(SlaveACK==1);
+;	src/i2c.c:226: while(SlaveACK==1);
 	mov	dptr,#_SlaveACK
 	movx	a,@dptr
 	mov	r7,a
 	cjne	r7,#0x01,00128$
 	sjmp	00103$
 00128$:
-;	src/i2c.c:211: i2cWritebyte(Address);
+;	src/i2c.c:227: i2cWritebyte(Address);
 	mov	dptr,#_i2cWrite_PARM_2
 	movx	a,@dptr
 	mov	dpl,a
 	lcall	_i2cWritebyte
-;	src/i2c.c:212: i2cWritebyte(Byte);
+;	src/i2c.c:228: i2cWritebyte(Byte);
 	mov	dptr,#_i2cWrite_Byte_10000_36
 	movx	a,@dptr
 	mov	dpl,a
 	lcall	_i2cWritebyte
-;	src/i2c.c:213: i2cStop();
-;	src/i2c.c:214: }
+;	src/i2c.c:229: i2cStop();
+;	src/i2c.c:230: }
 	ljmp	_i2cStop
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cRead'
@@ -765,7 +834,7 @@ _i2cWrite:
 ;Address       Allocated with name '_i2cRead_Address_10000_39'
 ;ReadByte      Allocated with name '_i2cRead_ReadByte_10000_40'
 ;------------------------------------------------------------
-;	src/i2c.c:221: unsigned char i2cRead(unsigned char Address)
+;	src/i2c.c:237: unsigned char i2cRead(unsigned char Address)
 ;	-----------------------------------------
 ;	 function i2cRead
 ;	-----------------------------------------
@@ -773,57 +842,55 @@ _i2cRead:
 	mov	a,dpl
 	mov	dptr,#_i2cRead_Address_10000_39
 	movx	@dptr,a
-;	src/i2c.c:224: do
+;	src/i2c.c:240: do
 00103$:
-;	src/i2c.c:226: i2cStart();
-	lcall	_i2cStart
-;	src/i2c.c:227: i2cWritebyte(DevAddress);
+;	src/i2c.c:242: i2cStartonce();
+	lcall	_i2cStartonce
+;	src/i2c.c:243: i2cWritebyte(DevAddress);
 	mov	dptr,#_DevAddress
 	movx	a,@dptr
 	mov	dpl,a
 	lcall	_i2cWritebyte
-;	src/i2c.c:228: if(SlaveACK==1)
+;	src/i2c.c:245: if(SlaveACK==1)
 	mov	dptr,#_SlaveACK
 	movx	a,@dptr
 	mov	r7,a
 	cjne	r7,#0x01,00104$
-;	src/i2c.c:229: i2cStop();
+;	src/i2c.c:246: i2cStop();
 	lcall	_i2cStop
 00104$:
-;	src/i2c.c:231: while(SlaveACK==1);
+;	src/i2c.c:248: while(SlaveACK==1);
 	mov	dptr,#_SlaveACK
 	movx	a,@dptr
 	mov	r7,a
 	cjne	r7,#0x01,00128$
 	sjmp	00103$
 00128$:
-;	src/i2c.c:232: i2cWritebyte(Address);
+;	src/i2c.c:249: i2cWritebyte(Address);
 	mov	dptr,#_i2cRead_Address_10000_39
 	movx	a,@dptr
 	mov	dpl,a
 	lcall	_i2cWritebyte
-;	src/i2c.c:233: i2cStop();
-	lcall	_i2cStop
-;	src/i2c.c:234: i2cStart();
-	lcall	_i2cStart
-;	src/i2c.c:235: i2cWritebyte(DevAddress+1);
+;	src/i2c.c:252: i2cStartonce();
+	lcall	_i2cStartonce
+;	src/i2c.c:253: i2cWritebyte(DevAddress+1);
 	mov	dptr,#_DevAddress
 	movx	a,@dptr
 	mov	r7,a
 	inc	r7
 	mov	dpl, r7
 	lcall	_i2cWritebyte
-;	src/i2c.c:236: ReadByte = i2cReadbyte(1);
+;	src/i2c.c:255: ReadByte = i2cReadbyte(1);
 	mov	dpl, #0x01
 	lcall	_i2cReadbyte
 	mov	r7, dpl
-;	src/i2c.c:237: i2cStop();
+;	src/i2c.c:256: i2cStop();
 	push	ar7
 	lcall	_i2cStop
 	pop	ar7
-;	src/i2c.c:238: return ReadByte;
+;	src/i2c.c:257: return ReadByte;
 	mov	dpl, r7
-;	src/i2c.c:239: }
+;	src/i2c.c:258: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cBegin'
@@ -832,7 +899,7 @@ _i2cRead:
 ;OscFreq       Allocated with name '_i2cBegin_OscFreq_10000_42'
 ;teMp          Allocated with name '_i2cBegin_teMp_10000_43'
 ;------------------------------------------------------------
-;	src/i2c.c:246: unsigned char i2cBegin(unsigned long OscFreq,unsigned long Speed)
+;	src/i2c.c:265: unsigned char i2cBegin(unsigned long OscFreq,unsigned long Speed)
 ;	-----------------------------------------
 ;	 function i2cBegin
 ;	-----------------------------------------
@@ -853,7 +920,7 @@ _i2cBegin:
 	mov	a,r4
 	inc	dptr
 	movx	@dptr,a
-;	src/i2c.c:248: unsigned char teMp = 12 / ((OscFreq / 1000)/1000);
+;	src/i2c.c:267: unsigned long teMp = 12 / ((OscFreq / 1000)/1000);
 	mov	dptr,#_i2cBegin_OscFreq_10000_42
 	movx	a,@dptr
 	mov	r4,a
@@ -910,59 +977,68 @@ _i2cBegin:
 	mov	a,r5
 	inc	dptr
 	movx	@dptr,a
+;	src/i2c.c:268: teMp = teMp + CLOCK_ERROR_CORRECTION;
 	mov	dptr,#0x000c
 	lcall	__divsint
 	mov	r6, dpl
-;	src/i2c.c:249: teMp = teMp + CLOCK_ERROR_CORRECTION;
-	inc	r6
-	inc	r6
-	inc	r6
-;	src/i2c.c:250: ClockVar = teMp / Speed;
+	mov	r7, dph
+	clr	a
+	mov	r5,a
+	mov	r4,a
+	mov	a,#0x03
+	add	a, r6
+	mov	r6,a
+	clr	a
+	addc	a, r7
+	mov	r7,a
+	clr	a
+	addc	a, r5
+	mov	r5,a
+	clr	a
+	addc	a, r4
+	mov	r4,a
+;	src/i2c.c:269: ClockVar = teMp / Speed;
 	mov	dptr,#_i2cBegin_PARM_2
 	movx	a,@dptr
+	mov	r0,a
+	inc	dptr
+	movx	a,@dptr
+	mov	r1,a
+	inc	dptr
+	movx	a,@dptr
+	mov	r2,a
+	inc	dptr
+	movx	a,@dptr
 	mov	r3,a
-	inc	dptr
-	movx	a,@dptr
-	mov	r4,a
-	inc	dptr
-	movx	a,@dptr
-	mov	r5,a
-	inc	dptr
-	movx	a,@dptr
-	mov	r7,a
-	mov	ar0,r6
-	mov	r1,#0x00
-	mov	r2,#0x00
-	mov	r6,#0x00
 	mov	dptr,#__divulong_PARM_2
+	mov	a,r0
+	movx	@dptr,a
+	mov	a,r1
+	inc	dptr
+	movx	@dptr,a
+	mov	a,r2
+	inc	dptr
+	movx	@dptr,a
 	mov	a,r3
-	movx	@dptr,a
-	mov	a,r4
 	inc	dptr
 	movx	@dptr,a
-	mov	a,r5
-	inc	dptr
-	movx	@dptr,a
-	mov	a,r7
-	inc	dptr
-	movx	@dptr,a
-	mov	dpl, r0
-	mov	dph, r1
-	mov	b, r2
-	mov	a, r6
+	mov	dpl, r6
+	mov	dph, r7
+	mov	b, r5
+	mov	a, r4
 	lcall	__divulong
 	mov	r4, dpl
 	mov	dptr,#_ClockVar
 	mov	a,r4
 	movx	@dptr,a
-;	src/i2c.c:251: }
+;	src/i2c.c:271: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2csetAdd'
 ;------------------------------------------------------------
 ;SlaveAddress  Allocated with name '_i2csetAdd_SlaveAddress_10000_44'
 ;------------------------------------------------------------
-;	src/i2c.c:258: void i2csetAdd(unsigned char SlaveAddress)
+;	src/i2c.c:278: void i2csetAdd(unsigned char SlaveAddress)
 ;	-----------------------------------------
 ;	 function i2csetAdd
 ;	-----------------------------------------
@@ -970,23 +1046,23 @@ _i2csetAdd:
 	mov	a,dpl
 	mov	dptr,#_i2csetAdd_SlaveAddress_10000_44
 	movx	@dptr,a
-;	src/i2c.c:260: DevAddress = SlaveAddress;
+;	src/i2c.c:280: DevAddress = SlaveAddress;
 	movx	a,@dptr
 	mov	dptr,#_DevAddress
 	movx	@dptr,a
-;	src/i2c.c:261: }
+;	src/i2c.c:281: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cDetect'
 ;------------------------------------------------------------
 ;_Address      Allocated with name '_i2cDetect__Address_10000_46'
 ;------------------------------------------------------------
-;	src/i2c.c:275: unsigned char i2cDetect(unsigned char _Address)
+;	src/i2c.c:295: unsigned char i2cDetect(unsigned char _Address)
 ;	-----------------------------------------
 ;	 function i2cDetect
 ;	-----------------------------------------
 _i2cDetect:
-;	src/i2c.c:278: }
+;	src/i2c.c:298: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cWriteBlock'
@@ -997,7 +1073,7 @@ _i2cDetect:
 ;duMmy         Allocated with name '_i2cWriteBlock_duMmy_10000_50'
 ;i             Allocated with name '_i2cWriteBlock_i_10000_50'
 ;------------------------------------------------------------
-;	src/i2c.c:285: void i2cWriteBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
+;	src/i2c.c:305: void i2cWriteBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
 ;	-----------------------------------------
 ;	 function i2cWriteBlock
 ;	-----------------------------------------
@@ -1005,7 +1081,7 @@ _i2cWriteBlock:
 	mov	a,dpl
 	mov	dptr,#_i2cWriteBlock_sAddress_10000_49
 	movx	@dptr,a
-;	src/i2c.c:289: for(duMmy=sAddress;i<= eAddress;duMmy++)
+;	src/i2c.c:309: for(duMmy=sAddress;i<= eAddress;duMmy++)
 	movx	a,@dptr
 	mov	r7,a
 	mov	dptr,#_i2cWriteBlock_PARM_3
@@ -1026,7 +1102,7 @@ _i2cWriteBlock:
 	mov	a,r3
 	subb	a,r2
 	jc	00105$
-;	src/i2c.c:291: i2cWrite(dPtr[i],duMmy);
+;	src/i2c.c:311: i2cWrite(dPtr[i],duMmy);
 	push	ar3
 	mov	a,r2
 	add	a, r4
@@ -1057,14 +1133,14 @@ _i2cWriteBlock:
 	pop	ar5
 	pop	ar6
 	pop	ar7
-;	src/i2c.c:292: i++;
+;	src/i2c.c:312: i++;
 	inc	r2
-;	src/i2c.c:289: for(duMmy=sAddress;i<= eAddress;duMmy++)
+;	src/i2c.c:309: for(duMmy=sAddress;i<= eAddress;duMmy++)
 	inc	r7
 	pop	ar3
 	sjmp	00103$
 00105$:
-;	src/i2c.c:294: }
+;	src/i2c.c:314: }
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'i2cReadBlock'
@@ -1076,7 +1152,7 @@ _i2cWriteBlock:
 ;duMmy         Allocated with name '_i2cReadBlock_duMmy_10000_54'
 ;i             Allocated with name '_i2cReadBlock_i_10000_54'
 ;------------------------------------------------------------
-;	src/i2c.c:301: void i2cReadBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
+;	src/i2c.c:321: void i2cReadBlock(unsigned char sAddress,unsigned char eAddress,unsigned char *dPtr)
 ;	-----------------------------------------
 ;	 function i2cReadBlock
 ;	-----------------------------------------
@@ -1084,7 +1160,7 @@ _i2cReadBlock:
 	mov	a,dpl
 	mov	dptr,#_i2cReadBlock_sAddress_10000_53
 	movx	@dptr,a
-;	src/i2c.c:305: for(duMmy=sAddress;i<= eAddress;duMmy++)
+;	src/i2c.c:325: for(duMmy=sAddress;i<= eAddress;duMmy++)
 	movx	a,@dptr
 	mov	r7,a
 	mov	dptr,#_i2cReadBlock_PARM_3
@@ -1105,7 +1181,7 @@ _i2cReadBlock:
 	mov	a,r3
 	subb	a,r2
 	jc	00105$
-;	src/i2c.c:307: dPtr[i] = i2cRead(duMmy);
+;	src/i2c.c:327: dPtr[i] = i2cRead(duMmy);
 	push	ar3
 	mov	a,r2
 	add	a, r4
@@ -1132,14 +1208,14 @@ _i2cReadBlock:
 	mov	b,(_i2cReadBlock_sloc0_1_0 + 2)
 	mov	a,r3
 	lcall	__gptrput
-;	src/i2c.c:308: i++;
+;	src/i2c.c:328: i++;
 	inc	r2
-;	src/i2c.c:305: for(duMmy=sAddress;i<= eAddress;duMmy++)
+;	src/i2c.c:325: for(duMmy=sAddress;i<= eAddress;duMmy++)
 	inc	r7
 	pop	ar3
 	sjmp	00103$
 00105$:
-;	src/i2c.c:310: }
+;	src/i2c.c:330: }
 	ret
 	.area CSEG    (CODE)
 	.area CONST   (CODE)

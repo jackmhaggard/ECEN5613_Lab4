@@ -9,9 +9,15 @@
 ; Public variables in this module
 ;--------------------------------------------------------
 	.globl _main
+	.globl _atoi
 	.globl _putchar
 	.globl _getchar
 	.globl _printf
+	.globl _i2csetAdd
+	.globl _i2cRead
+	.globl _i2cWrite
+	.globl _i2cStop
+	.globl _i2cBegin
 	.globl _CY
 	.globl _AC
 	.globl _F0
@@ -208,6 +214,7 @@
 	.globl _RCAP2H
 	.globl _RCAP2L
 	.globl _T2CON
+	.globl _Input
 	.globl _Program
 ;--------------------------------------------------------
 ; special function registers
@@ -455,6 +462,8 @@ __start__stack:
 ; uninitialized external ram data
 ;--------------------------------------------------------
 	.area XSEG    (XDATA)
+_Input_temp_10000_67:
+	.ds 6
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
@@ -580,7 +589,26 @@ _main:
 	ar2 = 0x02
 	ar1 = 0x01
 	ar0 = 0x00
-;	src/main.c:45: printf("\n\r Lab4 Part 1 EEPROM Program\n\r");
+;	src/main.c:44: i2cSetPort();
+	lcall	_i2cSetPort
+;	src/main.c:46: i2cBegin(11059200, 1);
+	mov	dptr,#_i2cBegin_PARM_2
+	mov	a,#0x01
+	movx	@dptr,a
+	clr	a
+	inc	dptr
+	movx	@dptr,a
+	inc	dptr
+	movx	@dptr,a
+	inc	dptr
+	movx	@dptr,a
+	mov	dptr,#0xc000
+	mov	b, #0xa8
+	lcall	_i2cBegin
+;	src/main.c:48: i2csetAdd(0xA0);
+	mov	dpl, #0xa0
+	lcall	_i2csetAdd
+;	src/main.c:49: printf("\n\r Lab4 Part 1 EEPROM Program\n\r");
 	mov	a,#___str_0
 	push	acc
 	mov	a,#(___str_0 >> 8)
@@ -591,25 +619,71 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:47: while(1){
+;	src/main.c:51: while(1){
 00102$:
-;	src/main.c:50: Program();
+;	src/main.c:54: Program();
 	lcall	_Program
-;	src/main.c:53: }
+;	src/main.c:57: }
 	sjmp	00102$
 ;------------------------------------------------------------
-;Allocation info for local variables in function 'Program'
+;Allocation info for local variables in function 'Input'
 ;------------------------------------------------------------
-;c             Allocated with name '_Program_c_10000_65'
+;temp          Allocated with name '_Input_temp_10000_67'
+;c             Allocated with name '_Input_c_10000_67'
+;i             Allocated with name '_Input_i_10000_67'
 ;------------------------------------------------------------
-;	src/main.c:56: void Program()
+;	src/main.c:59: int Input(){
 ;	-----------------------------------------
-;	 function Program
+;	 function Input
 ;	-----------------------------------------
-_Program:
-;	src/main.c:60: while(1)
-00110$:
-;	src/main.c:62: printf("\n\r ------ Commands ------\n\r");
+_Input:
+;	src/main.c:63: while(1){
+	mov	r7,#0x00
+00106$:
+;	src/main.c:64: c = getchar();
+	push	ar7
+	lcall	_getchar
+	mov	r5, dpl
+	pop	ar7
+;	src/main.c:65: if(c == '\r'){
+	cjne	r5,#0x0d,00129$
+	sjmp	00107$
+00129$:
+;	src/main.c:68: if(i < sizeof(temp)-1){
+	cjne	r7,#0x05,00130$
+00130$:
+	jnc	00104$
+;	src/main.c:69: temp[i] = c;
+	mov	a,r7
+	add	a, #_Input_temp_10000_67
+	mov	dpl,a
+	clr	a
+	addc	a, #(_Input_temp_10000_67 >> 8)
+	mov	dph,a
+	mov	a,r5
+	movx	@dptr,a
+;	src/main.c:70: i++;
+	inc	r7
+00104$:
+;	src/main.c:73: putchar(c);
+	mov	r6,#0x00
+	mov	dpl, r5
+	mov	dph, r6
+	push	ar7
+	lcall	_putchar
+	pop	ar7
+	sjmp	00106$
+00107$:
+;	src/main.c:75: temp[i] = '\0';
+	mov	a,r7
+	add	a, #_Input_temp_10000_67
+	mov	dpl,a
+	clr	a
+	addc	a, #(_Input_temp_10000_67 >> 8)
+	mov	dph,a
+	clr	a
+	movx	@dptr,a
+;	src/main.c:76: printf("\n\r");
 	mov	a,#___str_1
 	push	acc
 	mov	a,#(___str_1 >> 8)
@@ -620,7 +694,35 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:63: printf("\n\r W : Write Byte\n\r");
+;	src/main.c:77: return atoi(temp);
+	mov	dptr,#_Input_temp_10000_67
+	mov	b, #0x00
+;	src/main.c:78: }
+	ljmp	_atoi
+;------------------------------------------------------------
+;Allocation info for local variables in function 'Program'
+;------------------------------------------------------------
+;c             Allocated with name '_Program_c_10000_71'
+;page          Allocated with name '_Program_page_30001_74'
+;address       Allocated with name '_Program_address_30002_75'
+;data          Allocated with name '_Program_data_30003_76'
+;temp          Allocated with name '_Program_temp_30003_76'
+;page          Allocated with name '_Program_page_30001_78'
+;address       Allocated with name '_Program_address_30002_79'
+;temp          Allocated with name '_Program_temp_30002_79'
+;data          Allocated with name '_Program_data_30003_80'
+;address1      Allocated with name '_Program_address1_30001_82'
+;address2      Allocated with name '_Program_address2_30002_83'
+;i             Allocated with name '_Program_i_40000_85'
+;------------------------------------------------------------
+;	src/main.c:79: void Program()
+;	-----------------------------------------
+;	 function Program
+;	-----------------------------------------
+_Program:
+;	src/main.c:83: while(1)
+00114$:
+;	src/main.c:85: printf("\n\r ------ Commands ------\n\r");
 	mov	a,#___str_2
 	push	acc
 	mov	a,#(___str_2 >> 8)
@@ -631,7 +733,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:64: printf("\n\r R : Read Byte\n\r");
+;	src/main.c:86: printf("\n\r W : Write Byte\n\r");
 	mov	a,#___str_3
 	push	acc
 	mov	a,#(___str_3 >> 8)
@@ -642,7 +744,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:65: printf("\n\r H : Hex Dump\n\r");
+;	src/main.c:87: printf("\n\r R : Read Byte\n\r");
 	mov	a,#___str_4
 	push	acc
 	mov	a,#(___str_4 >> 8)
@@ -653,7 +755,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:66: printf("\n\r e : Reset EEPROM\n\r");
+;	src/main.c:88: printf("\n\r H : Hex Dump\n\r");
 	mov	a,#___str_5
 	push	acc
 	mov	a,#(___str_5 >> 8)
@@ -664,21 +766,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:67: c = getchar();
-	lcall	_getchar
-	mov	r6, dpl
-;	src/main.c:68: putchar(c);
-	mov	ar5,r6
-	mov	r7,#0x00
-	mov	dpl, r5
-	mov	dph, r7
-	push	ar6
-	lcall	_putchar
-	pop	ar6
-;	src/main.c:69: if(c == 'w')
-	cjne	r6,#0x77,00102$
-;	src/main.c:71: printf("\n\r Writing a Byte\n\r");
-	push	ar6
+;	src/main.c:89: printf("\n\r e : Reset EEPROM\n\r");
 	mov	a,#___str_6
 	push	acc
 	mov	a,#(___str_6 >> 8)
@@ -689,12 +777,24 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-	pop	ar6
-00102$:
-;	src/main.c:75: if(c == 'r'){
-	cjne	r6,#0x72,00104$
-;	src/main.c:76: printf("\n\r Reading a Byte\n\r");
+;	src/main.c:90: c = getchar();
+	lcall	_getchar
+	mov	r6, dpl
+;	src/main.c:91: putchar(c);
+	mov	ar5,r6
+	mov	r7,#0x00
+	mov	dpl, r5
+	mov	dph, r7
 	push	ar6
+	lcall	_putchar
+	pop	ar6
+;	src/main.c:92: if(c == 'w')
+	cjne	r6,#0x77,00164$
+	sjmp	00165$
+00164$:
+	ljmp	00111$
+00165$:
+;	src/main.c:94: printf("\n\r Writing a Byte\n\r");
 	mov	a,#___str_7
 	push	acc
 	mov	a,#(___str_7 >> 8)
@@ -705,12 +805,7 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-	pop	ar6
-00104$:
-;	src/main.c:80: if(c == 'd'){
-	cjne	r6,#0x64,00106$
-;	src/main.c:81: printf("\n\r Hex Dump\n\r");
-	push	ar6
+;	src/main.c:95: printf("\n\r Page: ");
 	mov	a,#___str_8
 	push	acc
 	mov	a,#(___str_8 >> 8)
@@ -721,15 +816,13 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-	pop	ar6
-00106$:
-;	src/main.c:85: if(c == 'e'){
-	cjne	r6,#0x65,00150$
-	sjmp	00151$
-00150$:
-	ljmp	00110$
-00151$:
-;	src/main.c:86: printf("\n\r Reseting EEPROM\n\r");
+;	src/main.c:97: int page = Input();
+	lcall	_Input
+	mov	r5, dpl
+	mov	r7, dph
+;	src/main.c:98: printf("\n\r Address: ");
+	push	ar7
+	push	ar5
 	mov	a,#___str_9
 	push	acc
 	mov	a,#(___str_9 >> 8)
@@ -740,8 +833,224 @@ _Program:
 	dec	sp
 	dec	sp
 	dec	sp
-;	src/main.c:91: }
-	ljmp	00110$
+;	src/main.c:100: int address = Input();
+	lcall	_Input
+	mov	r3, dpl
+	mov	r4, dph
+;	src/main.c:102: printf("\n\r Data: ");
+	push	ar4
+	push	ar3
+	mov	a,#___str_10
+	push	acc
+	mov	a,#(___str_10 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:104: int data = Input();
+	lcall	_Input
+	mov	r1, dpl
+	mov	r2, dph
+	pop	ar3
+	pop	ar4
+	pop	ar5
+	pop	ar7
+;	src/main.c:107: temp = temp | (page << 1);
+	mov	a,r5
+	add	a,r5
+	mov	r5,a
+	mov	a,#0xa0
+	orl	a,r5
+;	src/main.c:108: temp = temp & 0xFE;
+	anl	a,#0xfe
+;	src/main.c:109: i2csetAdd(temp);
+	mov	dpl,a
+	push	ar4
+	push	ar3
+	push	ar2
+	push	ar1
+	lcall	_i2csetAdd
+	pop	ar1
+	pop	ar2
+	pop	ar3
+	pop	ar4
+;	src/main.c:110: i2cWrite(data, address);
+	mov	dptr,#_i2cWrite_PARM_2
+	mov	a,r3
+	movx	@dptr,a
+	mov	dpl, r1
+	lcall	_i2cWrite
+	ljmp	00114$
+00111$:
+;	src/main.c:113: else if(c == 'r'){
+	cjne	r6,#0x72,00166$
+	sjmp	00167$
+00166$:
+	ljmp	00108$
+00167$:
+;	src/main.c:114: printf("\n\r Reading a Byte\n\r");
+	mov	a,#___str_11
+	push	acc
+	mov	a,#(___str_11 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:115: printf("\n\r Page: ");
+	mov	a,#___str_8
+	push	acc
+	mov	a,#(___str_8 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:117: int page = Input();
+	lcall	_Input
+	mov	r5, dpl
+	mov	r7, dph
+;	src/main.c:118: printf("\n\r Address: ");
+	push	ar7
+	push	ar5
+	mov	a,#___str_9
+	push	acc
+	mov	a,#(___str_9 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:120: int address = Input();
+	lcall	_Input
+	mov	r3, dpl
+	mov	r4, dph
+	pop	ar5
+	pop	ar7
+;	src/main.c:123: temp = temp | (page << 1);
+	mov	a,r5
+	add	a,r5
+	mov	r5,a
+	mov	a,#0xa0
+	orl	a,r5
+;	src/main.c:124: temp = temp & 0xFE;
+	anl	a,#0xfe
+;	src/main.c:125: i2csetAdd(temp);
+	mov	dpl,a
+	push	ar4
+	push	ar3
+	lcall	_i2csetAdd
+	pop	ar3
+	pop	ar4
+;	src/main.c:126: unsigned char data = i2cRead(address);
+	mov	dpl, r3
+	lcall	_i2cRead
+	mov	r7, dpl
+;	src/main.c:128: printf("\n\r Data is: %d\n\r", data);
+	mov	r5,#0x00
+	push	ar7
+	push	ar5
+	mov	a,#___str_12
+	push	acc
+	mov	a,#(___str_12 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	mov	a,sp
+	add	a,#0xfb
+	mov	sp,a
+	ljmp	00114$
+00108$:
+;	src/main.c:131: else if(c == 'd'){
+	cjne	r6,#0x64,00105$
+;	src/main.c:132: printf("\n\r Hex Dump\n\r");
+	mov	a,#___str_13
+	push	acc
+	mov	a,#(___str_13 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:133: printf("\n\r Address Start: ");
+	mov	a,#___str_14
+	push	acc
+	mov	a,#(___str_14 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:135: int address1 = Input();  
+	lcall	_Input
+;	src/main.c:137: printf("\n\r Address End: ");
+	mov	a,#___str_15
+	push	acc
+	mov	a,#(___str_15 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:139: int address2 = Input();         
+	lcall	_Input
+	ljmp	00114$
+00105$:
+;	src/main.c:145: else if(c == 'e'){
+	cjne	r6,#0x65,00170$
+	sjmp	00171$
+00170$:
+	ljmp	00114$
+00171$:
+;	src/main.c:146: printf("\n\r Reseting EEPROM\n\r");
+	mov	a,#___str_16
+	push	acc
+	mov	a,#(___str_16 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	lcall	_printf
+	dec	sp
+	dec	sp
+	dec	sp
+;	src/main.c:148: i2cStartonce();
+	lcall	_i2cStartonce
+;	src/main.c:150: for(int i = 0; i < 9; i++){
+	mov	r7,#0x00
+00117$:
+	cjne	r7,#0x09,00172$
+00172$:
+	jnc	00101$
+;	src/main.c:151: i2cClock();
+	push	ar7
+	lcall	_i2cDelay
+	pop	ar7
+;	src/main.c:150: for(int i = 0; i < 9; i++){
+	inc	r7
+	sjmp	00117$
+00101$:
+;	src/main.c:154: i2cStartonce();
+	lcall	_i2cStartonce
+;	src/main.c:156: i2cStop();
+	lcall	_i2cStop
+;	src/main.c:161: }
+	ljmp	00114$
 	.area CSEG    (CODE)
 	.area CONST   (CODE)
 	.area CONST   (CODE)
@@ -757,16 +1066,13 @@ ___str_0:
 ___str_1:
 	.db 0x0a
 	.db 0x0d
-	.ascii " ------ Commands ------"
-	.db 0x0a
-	.db 0x0d
 	.db 0x00
 	.area CSEG    (CODE)
 	.area CONST   (CODE)
 ___str_2:
 	.db 0x0a
 	.db 0x0d
-	.ascii " W : Write Byte"
+	.ascii " ------ Commands ------"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -775,7 +1081,7 @@ ___str_2:
 ___str_3:
 	.db 0x0a
 	.db 0x0d
-	.ascii " R : Read Byte"
+	.ascii " W : Write Byte"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -784,7 +1090,7 @@ ___str_3:
 ___str_4:
 	.db 0x0a
 	.db 0x0d
-	.ascii " H : Hex Dump"
+	.ascii " R : Read Byte"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -793,7 +1099,7 @@ ___str_4:
 ___str_5:
 	.db 0x0a
 	.db 0x0d
-	.ascii " e : Reset EEPROM"
+	.ascii " H : Hex Dump"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -802,7 +1108,7 @@ ___str_5:
 ___str_6:
 	.db 0x0a
 	.db 0x0d
-	.ascii " Writing a Byte"
+	.ascii " e : Reset EEPROM"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -811,7 +1117,7 @@ ___str_6:
 ___str_7:
 	.db 0x0a
 	.db 0x0d
-	.ascii " Reading a Byte"
+	.ascii " Writing a Byte"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
@@ -820,13 +1126,66 @@ ___str_7:
 ___str_8:
 	.db 0x0a
 	.db 0x0d
+	.ascii " Page: "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_9:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Address: "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_10:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Data: "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_11:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Reading a Byte"
+	.db 0x0a
+	.db 0x0d
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_12:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Data is: %d"
+	.db 0x0a
+	.db 0x0d
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_13:
+	.db 0x0a
+	.db 0x0d
 	.ascii " Hex Dump"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
 	.area CSEG    (CODE)
 	.area CONST   (CODE)
-___str_9:
+___str_14:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Address Start: "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_15:
+	.db 0x0a
+	.db 0x0d
+	.ascii " Address End: "
+	.db 0x00
+	.area CSEG    (CODE)
+	.area CONST   (CODE)
+___str_16:
 	.db 0x0a
 	.db 0x0d
 	.ascii " Reseting EEPROM"

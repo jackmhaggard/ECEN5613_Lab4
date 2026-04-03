@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Library for 8051.  If not, see <http://www.gnu.org/licenses/>.
-/**************************************************************************************************************/
+***************************************************************************************************************/
 
 
 
@@ -21,7 +21,7 @@
 **   File       : i2c.h
 **   Author     : Sriharsha
 **   Website    : www.zuna.in
-**   Email      : helpzuna@gmail.com
+**   Email      : helpzuna@gma*l.com
 **   Description: This is the i2c include file for 8051 family MCU's
 ***/
 #ifndef __i2c_h__
@@ -60,15 +60,16 @@
 #define SDABIT 1 << 1         // SDA Bit Position
 #define SCLBIT 1 << 0         // SCL Bit Position
 
-#define SDA ( (SDAPIN ) & (SDABIT) ) // SDA
-#define SCL ( (SCLPIN ) & (SCLBIT) ) // SCL
+//#define SDA ( (SDAPIN ) & (SDABIT) ) // SDA
+//#define SCL ( (SCLPIN ) & (SCLBIT) ) // SCL
+#define SDA P1_1
+#define SCL P1_0
 
+#define SDA_HIGH SDA = 1
+#define SDA_LOW  SDA = 0
 
-#define SDA_HIGH SDAPORT |= SDABIT
-#define SDA_LOW  SDAPORT &= ~SDABIT
-
-#define SCL_HIGH SCLPORT |= SCLBIT
-#define SCL_LOW  SCLPORT &= ~SCLBIT
+#define SCL_HIGH SCL = 1
+#define SCL_LOW  SCL = 0
 
 #define I2C_CLOCK_VAR                    100
 #define I2C_SCAN_TIMEOUT_COUNTER_VAL     50000

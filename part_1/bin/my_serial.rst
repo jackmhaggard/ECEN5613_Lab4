@@ -445,8 +445,8 @@
                                     445 ; uninitialized external ram data
                                     446 ;--------------------------------------------------------
                                     447 	.area XSEG    (XDATA)
-      000001                        448 _putchar_c_10000_3:
-      000001                        449 	.ds 2
+      000007                        448 _putchar_c_10000_3:
+      000007                        449 	.ds 2
                                     450 ;--------------------------------------------------------
                                     451 ; absolute external ram data
                                     452 ;--------------------------------------------------------
@@ -490,7 +490,7 @@
                                     490 ;	-----------------------------------------
                                     491 ;	 function putchar
                                     492 ;	-----------------------------------------
-      0021B3                        493 _putchar:
+      002380                        493 _putchar:
                            000007   494 	ar7 = 0x07
                            000006   495 	ar6 = 0x06
                            000005   496 	ar5 = 0x05
@@ -499,33 +499,33 @@
                            000002   499 	ar2 = 0x02
                            000001   500 	ar1 = 0x01
                            000000   501 	ar0 = 0x00
-      0021B3 AF 83            [24]  502 	mov	r7,dph
-      0021B5 E5 82            [12]  503 	mov	a,dpl
-      0021B7 90 00 01         [24]  504 	mov	dptr,#_putchar_c_10000_3
-      0021BA F0               [24]  505 	movx	@dptr,a
-      0021BB EF               [12]  506 	mov	a,r7
-      0021BC A3               [24]  507 	inc	dptr
-      0021BD F0               [24]  508 	movx	@dptr,a
+      002380 AF 83            [24]  502 	mov	r7,dph
+      002382 E5 82            [12]  503 	mov	a,dpl
+      002384 90 00 07         [24]  504 	mov	dptr,#_putchar_c_10000_3
+      002387 F0               [24]  505 	movx	@dptr,a
+      002388 EF               [12]  506 	mov	a,r7
+      002389 A3               [24]  507 	inc	dptr
+      00238A F0               [24]  508 	movx	@dptr,a
                                     509 ;	src/my_serial.c:14: while (!TI)
-      0021BE                        510 00101$:
+      00238B                        510 00101$:
                                     511 ;	src/my_serial.c:16: TI = 0;   // clear TI flag
                                     512 ;	assignBit
-      0021BE 10 99 02         [24]  513 	jbc	_TI,00118$
-      0021C1 80 FB            [24]  514 	sjmp	00101$
-      0021C3                        515 00118$:
+      00238B 10 99 02         [24]  513 	jbc	_TI,00118$
+      00238E 80 FB            [24]  514 	sjmp	00101$
+      002390                        515 00118$:
                                     516 ;	src/my_serial.c:17: SBUF = c; // load serial port with transmit value
-      0021C3 90 00 01         [24]  517 	mov	dptr,#_putchar_c_10000_3
-      0021C6 E0               [24]  518 	movx	a,@dptr
-      0021C7 FE               [12]  519 	mov	r6,a
-      0021C8 A3               [24]  520 	inc	dptr
-      0021C9 E0               [24]  521 	movx	a,@dptr
-      0021CA FF               [12]  522 	mov	r7,a
-      0021CB 8E 99            [24]  523 	mov	_SBUF,r6
+      002390 90 00 07         [24]  517 	mov	dptr,#_putchar_c_10000_3
+      002393 E0               [24]  518 	movx	a,@dptr
+      002394 FE               [12]  519 	mov	r6,a
+      002395 A3               [24]  520 	inc	dptr
+      002396 E0               [24]  521 	movx	a,@dptr
+      002397 FF               [12]  522 	mov	r7,a
+      002398 8E 99            [24]  523 	mov	_SBUF,r6
                                     524 ;	src/my_serial.c:18: return c;
-      0021CD 8E 82            [24]  525 	mov	dpl, r6
-      0021CF 8F 83            [24]  526 	mov	dph, r7
+      00239A 8E 82            [24]  525 	mov	dpl, r6
+      00239C 8F 83            [24]  526 	mov	dph, r7
                                     527 ;	src/my_serial.c:19: }
-      0021D1 22               [24]  528 	ret
+      00239E 22               [24]  528 	ret
                                     529 ;------------------------------------------------------------
                                     530 ;Allocation info for local variables in function 'getchar'
                                     531 ;------------------------------------------------------------
@@ -533,21 +533,21 @@
                                     533 ;	-----------------------------------------
                                     534 ;	 function getchar
                                     535 ;	-----------------------------------------
-      0021D2                        536 _getchar:
+      00239F                        536 _getchar:
                                     537 ;	src/my_serial.c:24: while (!RI)
-      0021D2                        538 00101$:
+      00239F                        538 00101$:
                                     539 ;	src/my_serial.c:26: RI = 0;      // clear RI flag
                                     540 ;	assignBit
-      0021D2 10 98 02         [24]  541 	jbc	_RI,00118$
-      0021D5 80 FB            [24]  542 	sjmp	00101$
-      0021D7                        543 00118$:
+      00239F 10 98 02         [24]  541 	jbc	_RI,00118$
+      0023A2 80 FB            [24]  542 	sjmp	00101$
+      0023A4                        543 00118$:
                                     544 ;	src/my_serial.c:27: return SBUF; // return character from SBUF
-      0021D7 AE 99            [24]  545 	mov	r6,_SBUF
-      0021D9 7F 00            [12]  546 	mov	r7,#0x00
-      0021DB 8E 82            [24]  547 	mov	dpl, r6
-      0021DD 8F 83            [24]  548 	mov	dph, r7
+      0023A4 AE 99            [24]  545 	mov	r6,_SBUF
+      0023A6 7F 00            [12]  546 	mov	r7,#0x00
+      0023A8 8E 82            [24]  547 	mov	dpl, r6
+      0023AA 8F 83            [24]  548 	mov	dph, r7
                                     549 ;	src/my_serial.c:28: }
-      0021DF 22               [24]  550 	ret
+      0023AC 22               [24]  550 	ret
                                     551 	.area CSEG    (CODE)
                                     552 	.area CONST   (CODE)
                                     553 	.area XINIT   (CODE)

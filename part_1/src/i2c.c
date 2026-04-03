@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Library for 8051.  If not, see <http://www.gnu.org/licenses/>.
-/**************************************************************************************************************/
+***************************************************************************************************************/
 
 
 
@@ -103,6 +103,9 @@ void i2cStart(void)
 	i2cClock(ClockVar);
 	SDA_LOW;
 	SCL_LOW;
+	
+	//i2cClock(ClockVar);
+
 }
 
 /*** Function    : i2cStartonce
@@ -126,11 +129,12 @@ void i2cStartonce(void)
 **/
 void i2cStop(void)
 {
+
 	SDA_LOW;
 	SCL_HIGH;
     i2cClock(ClockVar);
     SDA_HIGH;
-    SCL_LOW;
+    //SCL_LOW;
 }
 
 /*** Function    : i2cWritebyte
@@ -155,11 +159,12 @@ void i2cWritebyte(unsigned char uByte)
 		MaskByte /= 2;
 	}
 	while(MaskByte>0);
-	SDA_HIGH;
+
 	SCL_HIGH;
 	i2cClock(ClockVar);
 	SlaveACK = SDA;
 	SCL_LOW;
+	i2cClock(ClockVar);
 }
 
 /*** Function    : i2cReadbyte
@@ -175,21 +180,31 @@ unsigned char i2cReadbyte(unsigned char MasterACK)
 	MaskByte = 0x80;
 	do
 	{
+		
 		SCL_HIGH;
+		
 		if(SDA == 1)
 		{
 		uByte |= MaskByte;
 		}
+		i2cClock(ClockVar);
 		SCL_LOW;
+		i2cClock(ClockVar);
 		MaskByte /= 2;
 	}
 	while(MaskByte > 0);
+	SCL_HIGH;
+	i2cClock(ClockVar);
 	if(MasterACK==1)
 		SDA_HIGH;
 	else
 		SDA_LOW;
+	i2cClock(ClockVar);
+	
 	SCL_LOW;
-	SDA_HIGH;
+
+	i2cClock(ClockVar);
+
 	return uByte;
 }
 
@@ -202,8 +217,9 @@ void i2cWrite(unsigned char Byte,unsigned char Address)
 {
 	do
 	{
-		i2cStart();
+		i2cStartonce();
 		i2cWritebyte(DevAddress);
+		//i2cWritebyte(0b10100000);
 		if(SlaveACK == 1)
 		i2cStop();
 	}
@@ -223,16 +239,19 @@ unsigned char i2cRead(unsigned char Address)
 	unsigned char ReadByte;
 	do
 	{
-		i2cStart();
+		i2cStartonce();
 		i2cWritebyte(DevAddress);
+		//i2cWritebyte(0b10100000);
 		if(SlaveACK==1)
 		i2cStop();
 	}
 	while(SlaveACK==1);
 	i2cWritebyte(Address);
-	i2cStop();
-	i2cStart();
+	//i2cStop();
+	//i2cStart();
+	i2cStartonce();
 	i2cWritebyte(DevAddress+1);
+
 	ReadByte = i2cReadbyte(1);
 	i2cStop();
 	return ReadByte;
@@ -245,9 +264,10 @@ unsigned char i2cRead(unsigned char Address)
 **/
 unsigned char i2cBegin(unsigned long OscFreq,unsigned long Speed)
 {
-unsigned char teMp = 12 / ((OscFreq / 1000)/1000);
+unsigned long teMp = 12 / ((OscFreq / 1000)/1000);
 teMp = teMp + CLOCK_ERROR_CORRECTION;
 ClockVar = teMp / Speed;
+
 }
 
 /*** Function    : i2csetAdd

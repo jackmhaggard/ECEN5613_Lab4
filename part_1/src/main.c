@@ -42,8 +42,10 @@
 void main(){
     //initialize i2c?
     i2cSetPort();
-    i2cBegin(11059200, 100000);
     //i2csetAdd(0xA0);
+    i2cBegin(11059200, 1);
+
+    i2csetAdd(0xA0);
     printf("\n\r Lab4 Part 1 EEPROM Program\n\r");
 
     while(1){
@@ -54,7 +56,26 @@ void main(){
 
 }
 
+int Input(){
+    char temp[6];
+    char c;
+    int i = 0;
+    while(1){
+        c = getchar();
+        if(c == '\r'){
+            break;
+        }
+        if(i < sizeof(temp)-1){
+            temp[i] = c;
+            i++;
 
+        }
+        putchar(c);
+    }
+    temp[i] = '\0';
+    printf("\n\r");
+    return atoi(temp);
+}
 void Program()
 {
     char c;
@@ -71,74 +92,68 @@ void Program()
         if(c == 'w')
         {
             printf("\n\r Writing a Byte\n\r");
+            printf("\n\r Page: ");
+            
+            int page = Input();
             printf("\n\r Address: ");
-            char temp[6];
-            char c;
-            int i = 0;
-            while(1){
-                c = getchar();
-                if(c == '\r'){
-                   break;
-                }
-                if(i < sizeof(temp)-1){
-                    temp[i] = c;
-                    i++;
-
-                }
-                putchar(c);
-            }
-            int address = atoi(temp);
+            
+            int address = Input();
 
             printf("\n\r Data: ");
-            char temp[6];
-            char c;
-            int i = 0;
-            while(1){
-                c = getchar();
-                if(c == '\r'){
-                   break;
-                }
-                if(i < sizeof(temp)-1){
-                    temp[i] = c;
-                    i++;
 
-                }
-                putchar(c);
-            }
-            int data = atoi(temp);
+            int data = Input();
             //put write funciton call here
+            int temp = 0xA0;
+            temp = temp | (page << 1);
+            temp = temp & 0xFE;
+            i2csetAdd(temp);
+            i2cWrite(data, address);
         }
 
         else if(c == 'r'){
             printf("\n\r Reading a Byte\n\r");
+            printf("\n\r Page: ");
+            
+            int page = Input();
             printf("\n\r Address: ");
-            char temp[6];
-            char c;
-            int i = 0;
-            while(1){
-                c = getchar();
-                if(c == '\r'){
-                   break;
-                }
-                if(i < sizeof(temp)-1){
-                    temp[i] = c;
-                    i++;
-
-                }
-                putchar(c);
-            }
-            int data = atoi(temp);
+            
+            int address = Input();
+            //actualyl do i2c read
+            int temp = 0xA0;
+            temp = temp | (page << 1);
+            temp = temp & 0xFE;
+            i2csetAdd(temp);
+            unsigned char data = i2cRead(address);
             
             printf("\n\r Data is: %d\n\r", data);
         }
 
         else if(c == 'd'){
             printf("\n\r Hex Dump\n\r");
+            printf("\n\r Address Start: ");
             
+            int address1 = Input();  
+
+            printf("\n\r Address End: ");
+            
+            int address2 = Input();         
         }
+             
+
+            //iterate through addresses, printing 16 per line
 
         else if(c == 'e'){
             printf("\n\r Reseting EEPROM\n\r");
+            //start bit
+            i2cStartonce();
+            //9 bits of 1
+            for(int i = 0; i < 9; i++){
+                i2cClock();
+            }
+            //start bit
+            i2cStartonce();
+            //stop bit
+            i2cStop();
         }
 
         

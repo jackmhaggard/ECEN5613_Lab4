@@ -1,0 +1,30 @@
+Name     Lab4 ;
+PartNo   00 ;
+Date     4/9/2026 ;
+Revision 01 ;
+Designer Engineer ;
+Company  University of Colorado ;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 2    =   A15                      ; /*                                 */ 
+PIN 3    =   A14                      ; /*                                 */ 
+PIN 4    =   A13                      ; /*                                 */ 
+PIN 5    =   A12                      ; /*                                 */ 
+PIN 6    =   RD_n                      ; /*                                 */ 
+PIN 7    =   PSEN_n                      ; /*                                 */ 
+PIN 8    =   WR_n                      ; /*                                 */ 
+
+/* *************** OUTPUT PINS *********************/
+PIN 18    = READ_n                        ; /*                                 */ 
+PIN 19    = CE_SRAM_n                        ; /*                                 */ 
+PIN 17    = Enable                        ; /*                                 */ 
+
+
+READ_n = RD_n & PSEN_n;
+CE_SRAM_n = A15;
+Enable  = A15 & (!WR_n # !RD_n);
+
+

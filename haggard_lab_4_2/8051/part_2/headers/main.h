@@ -1,0 +1,12 @@
+void Program(void);
+int Input(void);
+void lcdinit(void);
+void lcdbusywait(void);
+void lcdgotoaddr(unsigned char);
+void lcdgotoxy(unsigned char, unsigned char);
+void lcdputch(char);
+void lcdputstr(char *);
+void lcdclear(void);
+void delay(unsigned int);
+void init_timer_registers(void);
+void lcdtimer();
